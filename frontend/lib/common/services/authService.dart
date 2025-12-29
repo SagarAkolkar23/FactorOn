@@ -5,12 +5,16 @@ class AuthService {
   Future<AuthResponse> login({
     required String email,
     required String password,
+    String? fcmToken,
   }) async {
     final response = await DioClient.dio.post(
       "/auth/login",
-      data: {"email": email, "password": password},
+      data: {
+        "email": email,
+        "password": password,
+        if (fcmToken != null) "fcmToken": fcmToken,
+      },
     );
-    //debugPrint("Auth: token from backend, ${response.data.token}");
 
     return AuthResponse.fromJson(response.data);
   }
@@ -20,7 +24,6 @@ class AuthService {
     required String password,
     required String role,
   }) async {
-    print("Entered register");
     await DioClient.dio.post(
       "/auth/register",
       data: {"email": email, "password": password, "role": role},

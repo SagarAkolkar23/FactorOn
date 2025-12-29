@@ -5,6 +5,9 @@ import cors from "cors";
 import mongoose from "mongoose";
 import authRoutes from "./routes/authRoutes.js"
 import machineRoutes from "./routes/machineRoutes.js"
+import machineDowntimeRoutes from "./routes/machineDowntimeRoute.js"
+import supervisorRoutes from "./routes/supervisorRoutes.js"
+import { errorHandler } from "./middleware/errorHandler.js";
 
 dotenv.config();
 
@@ -43,9 +46,20 @@ app.get("/health", (req, res) => {
   });
 });
 
+
 app.use("/API/auth", authRoutes);
 app.use("/API/machines", machineRoutes);
+app.use("/API/downtime", machineDowntimeRoutes);
+app.use("/API/supervisor", supervisorRoutes);
 
+// Error handler must be after all routes
+app.use(errorHandler);
+
+
+if (!process.env.MONGODB_CONN) {
+  console.error("❌ MONGODB_CONN environment variable is not set");
+  process.exit(1);
+}
 
 mongoose
   .connect(process.env.MONGODB_CONN, { dbName: "LimeLIghtIt" })
@@ -54,22 +68,11 @@ mongoose
   })
   .catch((err) => {
     console.error("❌ Database connection failed:", err.message);
+    // Don't exit in production, but log the error
+    if (process.env.NODE_ENV === "development") {
+      process.exit(1);
+    }
   });
-
-
-app.use((err, req, res, next) => {
-  console.error("🔥 ERROR:", {
-    message: err.message,
-    stack: err.stack,
-    path: req.originalUrl,
-    method: req.method,
-  });
-
-  res.status(err.statusCode || 500).json({
-    success: false,
-    message: err.message || "Internal server error",
-  });
-});
 
 
 app.listen(PORT, () => {

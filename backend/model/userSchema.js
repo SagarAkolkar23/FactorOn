@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+
     password: {
       type: String,
       required: true,
@@ -18,8 +19,14 @@ const userSchema = new mongoose.Schema(
       enum: ["operator", "supervisor"],
       required: true,
     },
+    fcmTokens: {
+      type: [String],
+      default: [],
+    }
   },
   { timestamps: true }
 );
 
-export default userSchema
+const User = mongoose.models.User || mongoose.model("User", userSchema);
+
+export default User;

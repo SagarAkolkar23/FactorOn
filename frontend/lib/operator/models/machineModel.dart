@@ -3,8 +3,12 @@ class MachineModel {
   final String machineId;
   final String name;
   final String type;
+  final String status;
+
   final Map<String, dynamic>? details;
-  final Map<String, dynamic>? maintenance;
+
+  final DateTime? nextMaintenance;
+
   final DateTime? createdAt;
 
   MachineModel({
@@ -12,8 +16,9 @@ class MachineModel {
     required this.machineId,
     required this.name,
     required this.type,
+    required this.status,
     this.details,
-    this.maintenance,
+    this.nextMaintenance,
     this.createdAt,
   });
 
@@ -23,8 +28,15 @@ class MachineModel {
       machineId: json["machineId"],
       name: json["name"],
       type: json["type"],
+      status: json["status"],
       details: json["details"],
-      maintenance: json["maintenance"],
+
+      nextMaintenance:
+          json["maintenance"] != null &&
+              json["maintenance"]["nextMaintenance"] != null
+          ? DateTime.parse(json["maintenance"]["nextMaintenance"])
+          : null,
+
       createdAt: json["createdAt"] != null
           ? DateTime.parse(json["createdAt"])
           : null,
@@ -33,11 +45,16 @@ class MachineModel {
 
   Map<String, dynamic> toJson() {
     return {
+      "_id": id,
       "machineId": machineId,
       "name": name,
       "type": type,
+      "status": status,
       "details": details,
-      "maintenance": maintenance,
+      "maintenance": nextMaintenance != null
+          ? {"nextMaintenance": nextMaintenance!.toIso8601String()}
+          : null,
+      if (createdAt != null) "createdAt": createdAt!.toIso8601String(),
     };
   }
 }

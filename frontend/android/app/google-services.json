@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "939051601998",
+    "project_id": "limelightit-c7853",
+    "storage_bucket": "limelightit-c7853.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:939051601998:android:939d22131905217c28b31f",
+        "android_client_info": {
+          "package_name": "com.example.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDrHTPS_5C_zPVnKSDhvb6J5UE4KN88so"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

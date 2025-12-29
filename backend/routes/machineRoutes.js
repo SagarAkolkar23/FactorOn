@@ -19,4 +19,5 @@ router.delete("/delete/:id", authenticate, roleGuard(["operator"]), deleteMachin
 
 router.get("/get", authenticate, getMachines);
 
+
 export default router;

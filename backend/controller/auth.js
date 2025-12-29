@@ -49,7 +49,7 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, fcmToken } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -67,11 +67,24 @@ export const login = async (req, res, next) => {
     }
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
-    
     if (!isPasswordMatch) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
+      });
+    }
+
+    if (fcmToken) {
+      if (!user.fcmTokens.includes(fcmToken)) {
+        user.fcmTokens.push(fcmToken);
+        await user.save();
+      }
+    }
+
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: "Server configuration error",
       });
     }
 
@@ -97,3 +110,4 @@ export const login = async (req, res, next) => {
     next(error);
   }
 };
+

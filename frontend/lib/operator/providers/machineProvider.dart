@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:frontend/operator/models/machineModel.dart';
 import 'package:frontend/operator/services/machineService.dart';
 
@@ -11,13 +12,25 @@ final machineNotifierProvider =
       MachineNotifier.new,
     );
 
+
+final currentMachineIdProvider = StateProvider<String?>((ref) {
+  return null;
+});
+
+
 class MachineNotifier extends AsyncNotifier<List<MachineModel>> {
   late final MachineService _service;
 
   @override
   Future<List<MachineModel>> build() async {
     _service = ref.read(machineServiceProvider);
-    return _service.getMachines();
+    try {
+      return await _service.getMachines();
+    } catch (e) {
+      // If error, return empty list to prevent app crash
+      // The UI should handle showing offline message
+      return [];
+    }
   }
 
   Future<void> refresh() async {
@@ -97,3 +110,4 @@ class MachineNotifier extends AsyncNotifier<List<MachineModel>> {
     }
   }
 }
+

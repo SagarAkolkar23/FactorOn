@@ -1,7 +1,9 @@
 import 'package:frontend/common/screens/RegisterScreen.dart';
 import 'package:frontend/common/screens/loginScreen.dart';
 import 'package:frontend/common/screens/splashScreen.dart';
+import 'package:frontend/operator/models/machineModel.dart';
 import 'package:frontend/operator/screens/homeScreen.dart';
+import 'package:frontend/operator/screens/machineDetailScreen.dart';
 import 'package:frontend/supervisor/screens/homeScreen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,6 +15,13 @@ class AppRouter {
       GoRoute(path: "/login", builder: (context, state) => LoginScreen()),
       GoRoute(path: "/register", builder: (context, state) => RegisterScreen()),
       GoRoute(path: "/operatorHome", builder: (context, state) => OperatorHomeScreen()),
+      GoRoute(
+        path: "/machineDetail",
+        builder: (context, state) {
+          final machine = state.extra as MachineModel;
+          return MachineDetailScreen(machine: machine);
+        },
+      ),
       GoRoute(path: "/supervisorHome", builder: (context, state) => HomescreenS()),
 
 

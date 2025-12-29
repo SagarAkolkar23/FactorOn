@@ -4,6 +4,9 @@ import 'package:frontend/operator/models/machineModel.dart';
 import 'package:frontend/operator/providers/machineProvider.dart';
 import 'package:frontend/widgets/machineCard.dart';
 import 'package:frontend/widgets/operator/addMachineDialog.dart';
+import 'package:frontend/widgets/offline_indicator.dart';
+import 'package:frontend/widgets/pending_operations_indicator.dart';
+import 'package:go_router/go_router.dart';
 
 class OperatorHomeScreen extends ConsumerWidget {
   const OperatorHomeScreen({super.key});
@@ -22,51 +25,59 @@ class OperatorHomeScreen extends ConsumerWidget {
         foregroundColor: Colors.black,
       ),
 
-      body: machinesState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => 
-        _ErrorState(
-          message: e.toString(),
-          onRetry: () {
-            ref.invalidate(machineNotifierProvider);
-          },
-        ),
-        data: (machines) {
-          if (machines.isEmpty) {
-            return const _EmptyState();
-          }
+      body: Column(
+        children: [
+          const OfflineIndicator(),
+          const PendingOperationsIndicator(),
+          Expanded(
+            child: machinesState.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => _ErrorState(
+                message: e.toString(),
+                onRetry: () {
+                  ref.invalidate(machineNotifierProvider);
+                },
+              ),
+              data: (machines) {
+                if (machines.isEmpty) {
+                  return const _EmptyState();
+                }
 
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(machineNotifierProvider);
-            },
-            child: ListView.builder(
-              padding: const EdgeInsets.only(bottom: 100),
-              itemCount: machines.length,
-              itemBuilder: (context, index) {
-                final MachineModel machine = machines[index];
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    ref.invalidate(machineNotifierProvider);
+                  },
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 100),
+                    itemCount: machines.length,
+                    itemBuilder: (context, index) {
+                      final MachineModel machine = machines[index];
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: MachineCard(
-                    machine: machine,
-                    onTap: () {
-                      
-                    },
-                    onDelete: () {
-                      ref
-                          .read(machineNotifierProvider.notifier)
-                          .deleteMachine(machine.id);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: MachineCard(
+                          machine: machine,
+                          onTap: () {
+                            ref.read(currentMachineIdProvider.notifier).state =
+                                machine.id;
+
+                            context.push(
+                              "/machineDetail",
+                              extra: machine,
+                            );
+                          },
+                        ),
+                      );
                     },
                   ),
                 );
               },
             ),
-          );
-        },
+          ),
+        ],
       ),
 
  floatingActionButton: FloatingActionButton.extended(
@@ -84,7 +95,6 @@ class OperatorHomeScreen extends ConsumerWidget {
     );
   }
 }
-
 
 class _EmptyState extends StatelessWidget {
   const _EmptyState();
